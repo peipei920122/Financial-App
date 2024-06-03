@@ -109,9 +109,3 @@ class KBar():
     #     mavalue=MA(self.TAKBar,timeperiod=tn,matype=0)
     #     return (self.TAKBar['close']-mavalue)/mavalue
 
-# 创建一个 KBar 对象
-kbar_instance = KBar(date='2024/06/04', cycle=1)
-
-# 调用 AddPrice 方法
-tag = kbar_instance.AddPrice(time='2024/06/04 09:30:00', open_price=100, close_price=110, low_price=90, high_price=120, volume=1000)
-print(tag)
