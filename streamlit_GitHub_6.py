@@ -322,16 +322,3 @@ with st.expander("K線圖, 長短 RSI"):
 
 
 
-
-
-print(type(start_date))
-print(type(end_date))
-print(type(df_original['time']))
-
-
-
-
-
-
-
-
