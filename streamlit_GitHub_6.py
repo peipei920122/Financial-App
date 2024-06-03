@@ -41,7 +41,7 @@ def load_data(url):
 
 
 
-df_original = load_data('2303.pkl')
+df_original = pd.read_pickle('2303.pkl')
 
 
 #df.columns  ## Index(['Unnamed: 0', 'time', 'open', 'low', 'high', 'close', 'volume','amount'], dtype='object')
@@ -55,16 +55,20 @@ df_original = load_data('2303.pkl')
 #type(df['time'][0])
 
 
-##### 選擇資料區間
+# 選擇資料區間
 st.subheader("選擇開始與結束的日期, 區間:2020/01/02 至 2024/06/03")
-start_date = st.text_input('選擇開始日期 (日期格式: 2020/01/02)', '2020/01/02')
-end_date = st.text_input('選擇結束日期 (日期格式: 2024/06/03)', '2024/06/03')
-if start_date is not None and end_date is not None:
-    start_date = datetime.datetime.strptime(start_date,'%Y/%m/%d')
-    end_date = datetime.datetime.strptime(end_date,'%Y/%m/%d')
-# 使用条件筛选选择时间区间的数据
-df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
+start_date_str = st.text_input('選擇開始日期 (日期格式: 2020/01/02)', '2020/01/02')
+end_date_str = st.text_input('選擇結束日期 (日期格式: 2024/06/03)', '2024/06/03')
 
+# 將字符串日期轉換為datetime.datetime對象
+start_date = datetime.datetime.strptime(start_date_str, '%Y/%m/%d')
+end_date = datetime.datetime.strptime(end_date_str, '%Y/%m/%d')
+
+if start_date is not None and end_date is not None:
+    # 將時間列轉換為 datetime.datetime 對象
+    df_original['time'] = pd.to_datetime(df_original['time'])
+    # 使用条件筛选选择时间区间的数据
+    df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
 
 ###### (2) 轉化為字典 ######:
 KBar_dic = df.to_dict()
