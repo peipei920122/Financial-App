@@ -17,7 +17,7 @@ class KBar():
         self.TAKBar['low'] = np.array([])
         self.TAKBar['close'] = np.array([])
         self.TAKBar['volume'] = np.array([])
-        self.current = datetime.datetime.strptime(date + ' 00:00:00','%Y-%m-%d %H:%M:%S')
+        self.current = datetime.datetime.strptime(date + ' 00:00:00','%Y/%m/%d %H:%M:%S')
         self.cycle = datetime.timedelta(minutes = cycle)
     # 更新最新報價
     def AddPrice(self,time, open_price, close_price, low_price, high_price,volume):
