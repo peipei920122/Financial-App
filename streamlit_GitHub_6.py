@@ -59,8 +59,9 @@ df_original = load_data('2303.pkl')
 st.subheader("選擇開始與結束的日期, 區間:2020-01-02 至 2024-06-03")
 start_date = st.text_input('選擇開始日期 (日期格式: 2020-01-02)', '2020-01-02')
 end_date = st.text_input('選擇結束日期 (日期格式: 2024-06-03)', '2024-06-03')
-start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
-end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
+if start_date is not None and end_date is not None:
+    start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
+    end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
 # 使用条件筛选选择时间区间的数据
 df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
 
@@ -319,6 +320,9 @@ with st.expander("K線圖, 長短 RSI"):
 
 
 
+print(type(start_date))
+print(type(end_date))
+print(type(df_original['time']))
 
 
 
