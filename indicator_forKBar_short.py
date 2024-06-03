@@ -20,31 +20,48 @@ class KBar():
         self.current = datetime.datetime.strptime(date + ' 00:00:00','%Y/%m/%d %H:%M:%S')
         self.cycle = datetime.timedelta(minutes = cycle)
     # 更新最新報價
-    def AddPrice(self,time, open_price, close_price, low_price, high_price,volume):
-        # 同一根K棒
-        if time <= self.current:
-            # 更新收盤價
-            self.TAKBar['close'][-1] = close_price
-            # 更新成交量
-            self.TAKBar['volume'][-1] += volume  
-            # 更新最高價
-            self.TAKBar['high'][-1] = max(self.TAKBar['high'][-1],high_price)
-            # 更新最低價
-            self.TAKBar['low'][-1] = min(self.TAKBar['low'][-1],low_price)  
-            # 若沒有更新K棒，則回傳0
-            return 0
-        # 不同根K棒
+def AddPrice(self, time, open_price, close_price, low_price, high_price, volume):
+    # 检查是否需要初始化键
+    if len(self.TAKBar['time']) == 0:
+        self.TAKBar['time'] = np.array([time])
+        self.TAKBar['open'] = np.array([open_price])
+        self.TAKBar['high'] = np.array([high_price])
+        self.TAKBar['low'] = np.array([low_price])
+        self.TAKBar['close'] = np.array([close_price])
+        self.TAKBar['volume'] = np.array([volume])
+        return 1  # 返回 1 表示成功添加了价格
+
+    # 同一根K棒
+    if time <= self.current:
+        # 检查长度是否足够支持负索引
+        if len(self.TAKBar['close']) == 0:
+            # 如果长度不够，将当前价格添加到数组末尾
+            self.TAKBar['time'] = np.append(self.TAKBar['time'], time)
+            self.TAKBar['open'] = np.append(self.TAKBar['open'], open_price)
+            self.TAKBar['high'] = np.append(self.TAKBar['high'], high_price)
+            self.TAKBar['low'] = np.append(self.TAKBar['low'], low_price)
+            self.TAKBar['close'] = np.append(self.TAKBar['close'], close_price)
+            self.TAKBar['volume'] = np.append(self.TAKBar['volume'], volume)
         else:
-            while time > self.current:
-                self.current += self.cycle
-            self.TAKBar['time'] = np.append(self.TAKBar['time'],self.current)
-            self.TAKBar['open'] = np.append(self.TAKBar['open'],open_price)
-            self.TAKBar['high'] = np.append(self.TAKBar['high'],high_price)
-            self.TAKBar['low'] = np.append(self.TAKBar['low'],low_price)
-            self.TAKBar['close'] = np.append(self.TAKBar['close'],close_price)
-            self.TAKBar['volume'] = np.append(self.TAKBar['volume'],volume)
-            # 若有更新K棒，則回傳1
-            return 1
+            # 更新最后一个价格
+            self.TAKBar['close'][-1] = close_price
+            self.TAKBar['volume'][-1] += volume
+            self.TAKBar['high'][-1] = max(self.TAKBar['high'][-1], high_price)
+            self.TAKBar['low'][-1] = min(self.TAKBar['low'][-1], low_price)
+        return 0  # 返回 0 表示未成功添加价格
+
+    # 不同根K棒
+    else:
+        while time > self.current:
+            self.current += self.cycle
+        self.TAKBar['time'] = np.append(self.TAKBar['time'], self.current)
+        self.TAKBar['open'] = np.append(self.TAKBar['open'], open_price)
+        self.TAKBar['high'] = np.append(self.TAKBar['high'], high_price)
+        self.TAKBar['low'] = np.append(self.TAKBar['low'], low_price)
+        self.TAKBar['close'] = np.append(self.TAKBar['close'], close_price)
+        self.TAKBar['volume'] = np.append(self.TAKBar['volume'], volume)
+        return 1  # 返回 1 表示成功添加了价格
+
     # 取時間
     def GetTime(self):
         return self.TAKBar['time']      
