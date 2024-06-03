@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.dates as mdates
 #from talib.abstract import *  # 載入技術指標函數
 
-    
 # 算K棒
 class KBar():
     # 設定初始化變數
@@ -19,48 +18,49 @@ class KBar():
         self.TAKBar['volume'] = np.array([])
         self.current = datetime.datetime.strptime(date + ' 00:00:00','%Y/%m/%d %H:%M:%S')
         self.cycle = datetime.timedelta(minutes = cycle)
+    
     # 更新最新報價
-def AddPrice(self, time, open_price, close_price, low_price, high_price, volume):
-    # 检查是否需要初始化键
-    if len(self.TAKBar['time']) == 0:
-        self.TAKBar['time'] = np.array([time])
-        self.TAKBar['open'] = np.array([open_price])
-        self.TAKBar['high'] = np.array([high_price])
-        self.TAKBar['low'] = np.array([low_price])
-        self.TAKBar['close'] = np.array([close_price])
-        self.TAKBar['volume'] = np.array([volume])
-        return 1  # 返回 1 表示成功添加了价格
+    def AddPrice(self, time, open_price, close_price, low_price, high_price, volume):
+        # 检查是否需要初始化键
+        if len(self.TAKBar['time']) == 0:
+            self.TAKBar['time'] = np.array([time])
+            self.TAKBar['open'] = np.array([open_price])
+            self.TAKBar['high'] = np.array([high_price])
+            self.TAKBar['low'] = np.array([low_price])
+            self.TAKBar['close'] = np.array([close_price])
+            self.TAKBar['volume'] = np.array([volume])
+            return 1  # 返回 1 表示成功添加了价格
 
-    # 同一根K棒
-    if time <= self.current:
-        # 检查长度是否足够支持负索引
-        if len(self.TAKBar['close']) == 0:
-            # 如果长度不够，将当前价格添加到数组末尾
-            self.TAKBar['time'] = np.append(self.TAKBar['time'], time)
+        # 同一根K棒
+        if time <= self.current:
+            # 检查长度是否足够支持负索引
+            if len(self.TAKBar['close']) == 0:
+                # 如果长度不够，将当前价格添加到数组末尾
+                self.TAKBar['time'] = np.append(self.TAKBar['time'], time)
+                self.TAKBar['open'] = np.append(self.TAKBar['open'], open_price)
+                self.TAKBar['high'] = np.append(self.TAKBar['high'], high_price)
+                self.TAKBar['low'] = np.append(self.TAKBar['low'], low_price)
+                self.TAKBar['close'] = np.append(self.TAKBar['close'], close_price)
+                self.TAKBar['volume'] = np.append(self.TAKBar['volume'], volume)
+            else:
+                # 更新最后一个价格
+                self.TAKBar['close'][-1] = close_price
+                self.TAKBar['volume'][-1] += volume
+                self.TAKBar['high'][-1] = max(self.TAKBar['high'][-1], high_price)
+                self.TAKBar['low'][-1] = min(self.TAKBar['low'][-1], low_price)
+            return 0  # 返回 0 表示未成功添加价格
+
+        # 不同根K棒
+        else:
+            while time > self.current:
+                self.current += self.cycle
+            self.TAKBar['time'] = np.append(self.TAKBar['time'], self.current)
             self.TAKBar['open'] = np.append(self.TAKBar['open'], open_price)
             self.TAKBar['high'] = np.append(self.TAKBar['high'], high_price)
             self.TAKBar['low'] = np.append(self.TAKBar['low'], low_price)
             self.TAKBar['close'] = np.append(self.TAKBar['close'], close_price)
             self.TAKBar['volume'] = np.append(self.TAKBar['volume'], volume)
-        else:
-            # 更新最后一个价格
-            self.TAKBar['close'][-1] = close_price
-            self.TAKBar['volume'][-1] += volume
-            self.TAKBar['high'][-1] = max(self.TAKBar['high'][-1], high_price)
-            self.TAKBar['low'][-1] = min(self.TAKBar['low'][-1], low_price)
-        return 0  # 返回 0 表示未成功添加价格
-
-    # 不同根K棒
-    else:
-        while time > self.current:
-            self.current += self.cycle
-        self.TAKBar['time'] = np.append(self.TAKBar['time'], self.current)
-        self.TAKBar['open'] = np.append(self.TAKBar['open'], open_price)
-        self.TAKBar['high'] = np.append(self.TAKBar['high'], high_price)
-        self.TAKBar['low'] = np.append(self.TAKBar['low'], low_price)
-        self.TAKBar['close'] = np.append(self.TAKBar['close'], close_price)
-        self.TAKBar['volume'] = np.append(self.TAKBar['volume'], volume)
-        return 1  # 返回 1 表示成功添加了价格
+            return 1  # 返回 1 表示成功添加了价格
 
     # 取時間
     def GetTime(self):
@@ -109,6 +109,9 @@ def AddPrice(self, time, open_price, close_price, low_price, high_price, volume)
     #     mavalue=MA(self.TAKBar,timeperiod=tn,matype=0)
     #     return (self.TAKBar['close']-mavalue)/mavalue
 
+# 创建一个 KBar 对象
+kbar_instance = KBar(date='2024/06/04', cycle=1)
 
-
-            
+# 调用 AddPrice 方法
+tag = kbar_instance.AddPrice(time='2024/06/04 09:30:00', open_price=100, close_price=110, low_price=90, high_price=120, volume=1000)
+print(tag)
